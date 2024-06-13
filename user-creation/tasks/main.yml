@@ -1,0 +1,58 @@
+# roles/user-creation/tasks/main.yml
+---
+- name: Create user {{ qa_admin_username }} with home directory
+  user:
+    name: "{{ qa_admin_username }}"
+    shell: /bin/bash
+    createhome: yes
+
+- name: Set password for {{ qa_admin_username }}
+  user:
+    name: "{{ qa_admin_username }}"
+    password: "{{ qa_admin_password }}"
+
+- name: Add {{ qa_admin_username }} to sudo group
+  user:
+    name: "{{ qa_admin_username }}"
+    groups: sudo
+    append: yes
+
+- name: Ensure correct permissions for /home/{{ qa_admin_username }}
+  file:
+    path: /home/{{ qa_admin_username }}
+    state: directory
+    owner: "{{ qa_admin_username }}"
+    group: "{{ qa_admin_username }}"
+    mode: "0755"
+
+- name: Create .ssh directory
+  file:
+    path: /home/{{ qa_admin_username }}/.ssh
+    state: directory
+    owner: "{{ qa_admin_username }}"
+    group: "{{ qa_admin_username }}"
+    mode: "0700" # drwx------
+
+- name: Copy the SSH public key to authorized_keys
+  copy:
+    src: user-creation/files/public-key.pem
+    dest: /home/{{ qa_admin_username }}/.ssh/authorized_keys
+    owner: "{{ qa_admin_username }}"
+    group: "{{ qa_admin_username }}"
+    mode: "0600" # -rw-------
+
+- name: Ensure correct permissions for .ssh directory
+  file:
+    path: /home/{{ qa_admin_username }}/.ssh
+    state: directory
+    owner: "{{ qa_admin_username }}"
+    group: "{{ qa_admin_username }}"
+    mode: "0700" # drwx------
+
+- name: Ensure correct permissions for authorized_keys file
+  file:
+    path: /home/{{ qa_admin_username }}/.ssh/authorized_keys
+    state: file
+    owner: "{{ qa_admin_username }}"
+    group: "{{ qa_admin_username }}"
+    mode: "0600" # -rw-------

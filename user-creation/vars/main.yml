@@ -1,0 +1,9 @@
+---
+# vars file for user-creation
+# roles/user-creation/vars/main.yml
+
+qa_admin_username: qa.admin
+qa_admin_password: "{{ 'qa@admin' | password_hash }}"
+
+
+
